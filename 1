@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Gems - Top Rated Recommendations</title>
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --steam-dark: #171a21;
+            --steam-blue: #66c0f4;
+            --steam-light-blue: #2a475e;
+            --steam-text: #c7d5e0;
+            --accent-green: #a4d007; /* For discounts/positive reviews */
+            --card-bg: #1b2838;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Motiva Sans', sans-serif, Arial;
+            background-color: var(--steam-dark);
+            color: var(--steam-text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--steam-light-blue);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p.subtitle {
+            color: var(--steam-blue);
+            font-size: 1.1rem;
+        }
+
+        /* Controls / Filter */
+        .controls {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(102, 192, 244, 0.2);
+            border: 1px solid var(--steam-blue);
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--steam-blue);
+            color: var(--steam-dark);
+        }
+
+        /* Game Grid */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem 4rem 1rem;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Game Card */
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 4px; /* Slight rounded corners */
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            outline: 1px solid var(--steam-blue);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .game-title {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-genre {
+            color: #8f98a0;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .review-score {
+            color: var(--accent-green);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .steam-link {
+            margin-top: auto;
+            text-decoration: none;
+            background: linear-gradient(90deg, #75b022 5%, #588a1b 95%);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+
+        .steam-link:hover {
+            background: linear-gradient(90deg, #8ed629 5%, #6aa621 95%);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #000;
+            font-size: 0.8rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Steam Gems</h1>
+        <p class="subtitle">Hand-picked, Overwhelmingly Positive Games</p>
+    </header>
+
+    <div class="controls">
+        <button class="filter-btn active" onclick="filterGames('all')">All Games</button>
+        <button class="filter-btn" onclick="filterGames('RPG')">RPG</button>
+        <button class="filter-btn" onclick="filterGames('Action')">Action</button>
+        <button class="filter-btn" onclick="filterGames('Strategy')">Strategy</button>
+        <button class="filter-btn" onclick="filterGames('Indie')">Indie</button>
+    </div>
+
+    <div class="container">
+        <div id="game-grid" class="game-grid">
+            <!-- Games will be injected here by JavaScript -->
+        </div>
+    </div>
+
+    <footer>
+        <p>This site is not affiliated with Valve Corporation. All game images and trademarks belong to their respective owners.</p>
+    </footer>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+
+        // 1. The Data (Mock Database of highly rated games)
+        // In a real app, you would fetch this from the Steam API
+        const gamesData = [
+            {
+                title: "Baldur's Gate 3",
+                genre: "RPG",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1086940/header.jpg",
+                link: "https://store.steampowered.com/app/1086940/Baldurs_Gate_3/"
+            },
+            {
+                title: "Hades",
+                genre: "Action",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1145360/header.jpg",
+                link: "https://store.steampowered.com/app/1145360/Hades/"
+            },
+            {
+                title: "Stardew Valley",
+                genre: "Indie",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/413150/header.jpg",
+                link: "https://store.steampowered.com/app/413150/Stardew_Valley/"
+            },
+            {
+                title: "Terraria",
+                genre: "Indie",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/header.jpg",
+                link: "https://store.steampowered.com/app/105600/Terraria/"
+            },
+            {
+                title: "Portal 2",
+                genre: "Strategy",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/header.jpg",
+                link: "https://store.steampowered.com/app/620/Portal_2/"
+            },
+            {
+                title: "Hollow Knight",
+                genre: "Action",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/header.jpg",
+                link: "https://store.steampowered.com/app/367520/Hollow_Knight/"
+            },
+            {
+                title: "Factorio",
+                genre: "Strategy",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/427520/header.jpg",
+                link: "https://store.steampowered.com/app/427520/Factorio/"
+            },
+            {
+                title: "The Witcher 3",
+                genre: "RPG",
+                review: "Overwhelmingly Positive",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/header.jpg",
+                link: "https://store.steampowered.com/app/292030/The_Witcher_3_Wild_Hunt/"
+            }
+        ];
+
+        const grid = document.getElementById('game-grid');
+        const buttons = document.querySelectorAll('.filter-btn');
+
+        // 2. Function to generate HTML for games
+        function renderGames(filter = 'all') {
+            grid.innerHTML = ''; // Clear current content
+
+            const filteredGames = filter === 'all' 
+                ? gamesData 
+                : gamesData.filter(game => game.genre === filter);
+
+            filteredGames.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                
+                card.innerHTML = `
+                    <img src="${game.image}" alt="${game.title}" class="card-image">
+                    <div class="card-content">
+                        <h3 class="game-title">${game.title}</h3>
+                        <p class="game-genre">${game.genre}</p>
+                        <p class="review-score">★ ${game.review}</p>
+                        <a href="${game.link}" target="_blank" class="steam-link">View on Steam</a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 3. Function to handle button clicks
+        function filterGames(category) {
+            // Remove active class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Find the clicked button (or the one matching the category) and add active class
+            event.target.classList.add('active');
+
+            renderGames(category);
+        }
+
+        // Initial render
+        renderGames();
+
+    </script>
+</body>
+</html>
